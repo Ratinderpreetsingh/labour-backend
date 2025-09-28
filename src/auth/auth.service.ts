@@ -25,7 +25,7 @@ export class AuthService {
     const user = this.userRepo.create({ ...dto, password: hashed });
     await this.userRepo.save(user);
 
-    return { message: 'User registered successfully' };
+    return { message: 'User registered successfully done' };
   }
 
   async login(dto: LoginDto) {
