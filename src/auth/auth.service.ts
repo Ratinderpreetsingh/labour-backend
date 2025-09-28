@@ -37,7 +37,7 @@ export class AuthService {
 
     const accessToken = await this.jwtService.signAsync(
       { sub: user.id, role: user.role },
-      { secret: process.env.JWT_SECRET, expiresIn: '15m' },
+      { secret: process.env.JWT_SECRET || 'labour', expiresIn: '15m' },
     );
 
     const refreshToken = await this.jwtService.signAsync(
