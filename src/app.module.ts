@@ -22,21 +22,35 @@ import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
-    // Load environment variables globally
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // Configure TypeORM
-    TypeOrmModule.forRoot({
-      type: 'postgres',                     // or 'mysql' if you use MySQL
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
-      database: process.env.DB_NAME || 'labour_db',
-      entities: [User],                      // Add all your entities here
-      synchronize: true,                     // auto-sync entities (dev only)
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        // 👉 Use Railway DB if DATABASE_URL is set
+        if (process.env.DATABASE_URL) {
+          return {
+            type: 'postgres',
+            url: process.env.DATABASE_URL,
+            autoLoadEntities: true,
+            synchronize: process.env.NODE_ENV !== 'production',
+            ssl: { rejectUnauthorized: false },
+          };
+        }
+
+        // 👉 Otherwise fallback to Local DB
+        return {
+          type: 'postgres',
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT, 10),
+          username: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_NAME,
+          entities: [User],
+          synchronize: true,
+        };
+      },
     }),
 
     AuthModule,
@@ -46,3 +60,4 @@ import { User } from './users/entities/user.entity';
   providers: [AppService],
 })
 export class AppModule {}
+
