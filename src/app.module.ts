@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User } from './users/entities/user.entity';
+import { LabourModule } from './labour/labour.module';
 
 @Module({
   imports: [
@@ -14,19 +15,20 @@ import { User } from './users/entities/user.entity';
       isGlobal: true,
     }),
 
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      autoLoadEntities: true,
-      synchronize: true,
+   TypeOrmModule.forRoot({
+  type: 'postgres',
+  url: process.env.DATABASE_URL,
+  autoLoadEntities: true,
+  synchronize: true,
+  ssl: {
+    rejectUnauthorized: false, // required for Neon
+  },
+}),
 
-      ssl: {
-        rejectUnauthorized: false, // for Neon cloud PostgreSQL
-      },
-    }),
 
     AuthModule,
     UsersModule,
+    LabourModule,
   ],
 
   controllers: [AppController],
